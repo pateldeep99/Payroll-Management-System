@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="D:/My Northeastern University/ITC 6000 DBMS/final project dbms report/Payroll_Management_System.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="125"/><column_width id="3" width="2931"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,10:maindepartment"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="SQL 3">
+/*Retrieve Employee Information along with Department Details*/
+SELECT e.first_name, e.last_name, e.email, d.dep_name FROM employee e JOIN 
+department d ON e.fk_dep_id = d.pk_dep_id;
+
+/*Update Employee Salary Information*/
+UPDATE salary SET base_salary = 65000, allowances = 3200, deductions = 1700, 
+net_salary = base_salary + allowances - deductions WHERE fk_emp_id = 1; 
+
+/*Calculate Total Salary and Net Pay for Each Employee*/
+SELECT e.first_name, e.last_name, s.base_salary + s.allowances - s.deductions AS 
+total_salary, pr.net_pay FROM employee e JOIN salary s ON e.pk_emp_id = s.fk_emp_id JOIN 
+payroll_record pr ON e.pk_emp_id = pr.fk_emp_id; 
+
+/*Retrieve Employee Salary and Tax Information*/
+SELECT e.first_name, e.last_name, s.base_salary, t.tax_rate, t.tax_threshold FROM 
+employee e JOIN salary s ON e.pk_emp_id = s.fk_emp_id JOIN tax_info t ON s.base_salary &gt;= 
+t.tax_threshold; 
+
+/*Payroll Summary Report*/
+SELECT pr.month, pr.financial_year, SUM(pr.total_salary) AS 
+total_salary_expense, AVG(s.base_salary + s.allowances - s.deductions) AS 
+avg_salary_per_employee, d.dep_name, SUM(pr.total_salary) AS department_salary_expense 
+FROM payroll_record pr JOIN employee e ON pr.fk_emp_id = e.pk_emp_id JOIN salary s ON 
+e.pk_emp_id = s.fk_emp_id JOIN department d ON e.fk_dep_id = d.pk_dep_id GROUP BY 
+pr.month, pr.financial_year, d.dep_name; 
+
+/*Tax Compliance Report*/
+SELECT COUNT(*) AS num_employees, SUM(CASE WHEN s.base_salary &gt;= 
+t.tax_threshold THEN 1 ELSE 0 END) AS num_taxable_employees, t.tax_rate FROM employee e 
+JOIN salary s ON e.pk_emp_id = s.fk_emp_id JOIN tax_info t ON s.base_salary &gt;= t.tax_threshold; 
+
+/*Employee Turnover Analysis*/
+SELECT (COUNT(CASE WHEN joining_date &gt;= '2023-01-01' THEN 1 ELSE 0 
+END) / COUNT(*)) * 100 AS join_rate, (COUNT(CASE WHEN joining_date &lt;= '2023-01-01' 
+THEN 1 ELSE 0 END) / COUNT(*)) * 100 AS leave_rate FROM employee;</sql><sql name="SQL 4"></sql><current_tab id="1"/></tab_sql></sqlb_project>
